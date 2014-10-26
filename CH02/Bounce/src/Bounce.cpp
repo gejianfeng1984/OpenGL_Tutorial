@@ -16,110 +16,109 @@
 #include <GL/glut.h>
 #endif
 
-GLBatch					squareBatch;
-GLShaderManager			shaderManager;
+GLBatch             squareBatch;
+GLShaderManager     shaderManager;
 
-GLfloat					blockSize = 0.1f;
-GLfloat					vVerts[] = { -blockSize, -blockSize, 0.0f,
-									  blockSize, -blockSize, 0.0f,
-									  blockSize,  blockSize, 0.0f,
-									  -blockSize,  blockSize, 0.0f };
+GLfloat             blockSize = 0.1f;
+GLfloat             vVerts[] = { -blockSize, -blockSize, 0.0f,
+                                  blockSize, -blockSize, 0.0f,
+                                  blockSize,  blockSize, 0.0f,
+                                 -blockSize,  blockSize, 0.0f };
 
 void SetupRC()
 {
-	glClearColor(0.0f, 0.0f, 1.0f, 1.0f);
-	shaderManager.InitializeStockShaders();
-
-	squareBatch.Begin(GL_TRIANGLE_FAN, 4);
-	squareBatch.CopyVertexData3f(vVerts);
-	squareBatch.End();
+    glClearColor(0.0f, 0.0f, 1.0f, 1.0f);
+    shaderManager.InitializeStockShaders();
+    
+    squareBatch.Begin(GL_TRIANGLE_FAN, 4);
+    squareBatch.CopyVertexData3f(vVerts);
+    squareBatch.End();
 }
 
 void BounceFunction()
 {
-	static GLfloat xDir = 1.0f;
-	static GLfloat yDir = 1.0f;
-
-	GLfloat stepSize = 0.005f;
-
-	GLfloat blockX = vVerts[0];
-	GLfloat blockY = vVerts[7];
-
-	blockX = blockX + xDir * stepSize;
-	blockY = blockY + yDir * stepSize;
-
-	if (blockX < -1.0f) {
-		blockX = -1.0f;
-		xDir = xDir * -1.0f;
-	}
-
-	if (blockX > 1.0f - blockSize * 2) {
-		blockX = 1.0f - blockSize * 2;
-		xDir = xDir * -1.0f;
-	}
-
-	if (blockY > 1.0f) {
-		blockY = 1.0;
-		yDir = yDir * -1.0f;
-	}
-
-	if (blockY < -1.0f + blockSize * 2) {
-		blockY = -1.0f + blockSize * 2;
-		yDir = yDir * -1.0f;
-	}
-
-	vVerts[0] = blockX;
-	vVerts[1] = blockY - blockSize * 2;
-
-	vVerts[3] = blockX + blockSize * 2;
-	vVerts[4] = blockY - blockSize * 2;
-
-	vVerts[6] = blockX + blockSize * 2;
-	vVerts[7] = blockY;
-
-	vVerts[9] = blockX;
-	vVerts[10] = blockY;
-
-	squareBatch.CopyVertexData3f(vVerts);
+    static GLfloat xDir = 1.0f;
+    static GLfloat yDir = 1.0f;
+    
+    GLfloat stepSize = 0.005f;
+    
+    GLfloat blockX = vVerts[0];
+    GLfloat blockY = vVerts[7];
+    
+    blockX += xDir * stepSize;
+    blockY += yDir * stepSize;
+    
+    if (blockX < -1.0f) {
+        blockX = -1.0f;
+        xDir *= -1;
+    }
+    
+    if (blockX > 1 - blockSize * 2) {
+        blockX = 1 - blockSize * 2;
+        xDir *= -1;
+    }
+    
+    if (blockY > 1) {
+        blockY = 1.0f;
+        yDir *= -1;
+    }
+    
+    if (blockY < -1 + blockSize * 2) {
+        blockY = -1 + blockSize * 2;
+        yDir *= -1;
+    }
+    
+    vVerts[0] = blockX;
+    vVerts[1] = blockY - blockSize * 2;
+    
+    vVerts[3] = blockX + blockSize * 2;
+    vVerts[4] = blockY - blockSize * 2;
+    
+    vVerts[6] = blockX + blockSize * 2;
+    vVerts[7] = blockY;
+    
+    vVerts[9] = blockX;
+    vVerts[10] = blockY;
+    
+    squareBatch.CopyVertexData3f(vVerts);
 }
 
 void RenderScene()
 {
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-	GLfloat vRed[] = { 1.0f, 0.0f, 0.0f, 1.0f };
-	shaderManager.UseStockShader(GLT_SHADER_IDENTITY, vRed);
-	squareBatch.Draw();
-
-	glutSwapBuffers();
-
-	BounceFunction();
-	glutPostRedisplay();
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+    GLfloat vRed[] = { 1.0f, 0.0f, 0.0f, 1.0f };
+    shaderManager.UseStockShader(GLT_SHADER_IDENTITY, vRed);
+    squareBatch.Draw();
+    glutSwapBuffers();
+    
+    BounceFunction();
+    glutPostRedisplay();
 }
 
 void ChangeSize(int width, int height)
 {
-	glViewport(0, 0, width, height);
+    glViewport(0, 0, width, height);
 }
 
 int main(int argc, char* argv[])
 {
-	gltSetWorkingDirectory(argv[0]);
-	glutInit(&argc, argv);
-	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
-	glutInitWindowSize(800, 600);
-	glutCreateWindow("Bounce");
-
-	glutReshapeFunc(ChangeSize);
-	glutDisplayFunc(RenderScene);
-
-	GLenum err = glewInit();
-	if (err != GLEW_OK) {
-		fprintf(stderr, "GLEW ERROR: %s\n", glewGetErrorString(err));
-		return 1;
-	}
-
-	SetupRC();
-	glutMainLoop();
-
-	return 0;
+    gltSetWorkingDirectory(argv[0]);
+    glutInit(&argc, argv);
+    glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
+    glutInitWindowSize(800, 600);
+    glutCreateWindow("Bounce");
+    
+    glutReshapeFunc(ChangeSize);
+    glutDisplayFunc(RenderScene);
+    
+    GLenum err = glewInit();
+    if (err != GLEW_OK) {
+        fprintf(stderr, "GLEW ERROR: %s\n", glewGetErrorString(err));
+        return 1;
+    }
+    
+    SetupRC();
+    glutMainLoop();
+    
+    return 0;
 }
